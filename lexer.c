@@ -18,23 +18,25 @@ enum Token {
 static std::string currentIdentifier; // value of identifier token
 static double numberValue;            // value of number token
 
-static int isWhiteSpace(char c) {
-  switch (c) {
-    case ' ':
-    case '\t':
-      return 1;
-      break;
-    default:
-      return 0;
-  }
-}
-
 static int getToken() {
   int lastCharacter = ' ';
 
   // skip whtespace
-  while(isWhiteSpace(lastCharacter)) {
+  while (isspace(lastCharacter)) {
     lastCharacter = getchar();
+  }
+
+  if (isalpha(lastCharacter)) {
+    currentIdentifier = lastCharacter;
+    while (isalnum((lastCharacter = getchar()))) {
+      currentIdentifier += lastCharacter;
+    }
+
+    // check for keywords
+    if (currentIdentifier == "def") return tok_def;
+    if (currentIdentifier == "extern") return tok_extern;
+
+    return tok_identifier;
   }
 
   return lastCharacter;
