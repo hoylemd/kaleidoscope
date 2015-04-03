@@ -7,7 +7,7 @@ EXECUTABLE=lex
 all: go
 
 compile: $(SOURCE)
-	$(COMPILER) $(FAGS) $(SOURCE) -o $(EXECUTABLE)
+	$(COMPILER) $(FLAGS) $(SOURCE) -o $(EXECUTABLE)
 
 go: compile
 	./$(EXECUTABLE)

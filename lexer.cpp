@@ -7,7 +7,7 @@
 #include <vector>
 #include <iostream>
 
-enum Token {
+enum TokenValues {
   tok_eof = -1,
   // keywords
   tok_def = -2, tok_extern = -3,
@@ -15,34 +15,65 @@ enum Token {
   tok_identifier = -4, tok_number = -5
 };
 
-static std::string currentIdentifier; // value of identifier token
-static double numberValue;            // value of number token
+class Token {
+public:
+  int code;
+  std::string value;
+  Token(int c, std::string v) : code(c), value(v) {}
+  Token(Token *t) : code(t->code), value(t->value) {}
+};
 
-static int getToken() {
-  int lastCharacter = ' ';
+static Token getToken() {
+  int lastCharacter = ' ', code = 0;
+
+  std::string currentToken; // value of identifier token
 
   // skip whtespace
   while (isspace(lastCharacter)) {
     lastCharacter = getchar();
   }
 
+  // parse identifiers / keywords
   if (isalpha(lastCharacter)) {
-    currentIdentifier = lastCharacter;
-    while (isalnum((lastCharacter = getchar()))) {
-      currentIdentifier += lastCharacter;
+    currentToken = lastCharacter;
+    while (isalnum(lastCharacter = getchar())) {
+      currentToken += lastCharacter;
     }
 
     // check for keywords
-    if (currentIdentifier == "def") return tok_def;
-    if (currentIdentifier == "extern") return tok_extern;
-
-    return tok_identifier;
+    if(currentToken == "def") {
+      code = tok_def;
+    } else if (currentToken == "extern") {
+      code = tok_extern;
+    } else {
+      code = tok_identifier;
+    }
   }
 
-  return lastCharacter;
+  // parse numbers
+  if (isdigit(lastCharacter)) {
+    currentToken = lastCharacter;
+    while (isdigit(lastCharacter = getchar())) {
+      currentToken += lastCharacter;
+    }
+
+    if (lastCharacter == '.') {
+    currentToken += lastCharacter;
+      while (isdigit(lastCharacter = getchar())) {
+        currentToken += lastCharacter;
+      }
+    }
+
+    code = tok_number;
+  }
+
+  return new Token(code, currentToken);
 }
 
 int main(void) {
-  std::cout << getToken();
+  Token tok =  getToken();
+
+  std::cout << "token code " << tok.code << ", literally: " << tok.value;
+
   return 0;
 }
