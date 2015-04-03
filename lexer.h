@@ -2,9 +2,7 @@
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
-#include <map>
 #include <string>
-#include <vector>
 #include <iostream>
 
 enum TokenValues {
