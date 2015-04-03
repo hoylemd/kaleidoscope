@@ -1,8 +1,4 @@
 // this returns character values or the defined tokens
-#include <cctype>
-#include <cstdio>
-#include <cstdlib>
-#include <string>
 #include <iostream>
 
 enum TokenValues {
