@@ -1,20 +1,26 @@
 COMPILER=G++
 FLAGS=-Wall -pedantic -ansi
 
-SOURCE=lexer.cpp
-EXECUTABLE=lex
+LEXER_SOURCE=lexer.cpp
+LEXER_OBJECT=lexer.o
+MAIN_SOURCE=main.cpp
+SOURCES=$(LEXER_SOURCE) $(MAIN_SOURCE)
+EXECUTABLE=kaleidoscope
 
 TESTFILE=fibo.k
 
 all: go
 
-compile: $(SOURCE)
-	$(COMPILER) $(FLAGS) $(SOURCE) -o $(EXECUTABLE)
+$(LEXER_OBJECT) : $(LEXER_SOURCE)
+	$(COMPILER) -c $(FLAGS) -o $(LEXER_OBJECT)
 
-go: compile
+compileall: $(SOURCES)
+	$(COMPILER) $(FLAGS) $(SOURCES) -o $(EXECUTABLE)
+
+go: compileall
 	./$(EXECUTABLE)
 
-test: compile
+test: compileall
 	cat $(TESTFILE) | ./$(EXECUTABLE)
 
 clean :

@@ -1,30 +1,6 @@
-// this returns character values or the defined tokens
-#include <cctype>
-#include <cstdio>
-#include <cstdlib>
-#include <map>
-#include <string>
-#include <vector>
-#include <iostream>
+#include "lexer.h"
 
-enum TokenValues {
-  tok_eof = -1,
-  // keywords
-  tok_def = -2, tok_extern = -3,
-  // functional
-  tok_identifier = -4, tok_number = -5
-};
-
-class Token {
-public:
-  int code;
-  std::string value;
-  Token(int c, std::string v) : code(c), value(v) {}
-  Token(Token *t) : code(t->code), value(t->value) {}
-  Token(): code(tok_eof), value("") {}
-};
-
-static Token getToken() {
+Token getToken() {
   int lastCharacter = ' ', code = 0;
 
   std::string currentToken; // value of identifier token
@@ -93,13 +69,3 @@ static Token getToken() {
   return new Token(code, currentToken);
 }
 
-int main(void) {
-  Token tok;
-
-  while ((tok = getToken()).code != tok_eof) {
-    std::cout << "token code " << tok.code << ", literally: " << tok.value;
-    std::cout << std::endl;
-  }
-
-  return 0;
-}
