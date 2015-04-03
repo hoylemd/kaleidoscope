@@ -21,6 +21,7 @@ public:
   std::string value;
   Token(int c, std::string v) : code(c), value(v) {}
   Token(Token *t) : code(t->code), value(t->value) {}
+  Token(): code(tok_eof), value("") {}
 };
 
 static Token getToken() {
@@ -33,9 +34,9 @@ static Token getToken() {
     lastCharacter = getchar();
   }
 
+  currentToken = lastCharacter;
   // parse identifiers / keywords
   if (isalpha(lastCharacter)) {
-    currentToken = lastCharacter;
     while (isalnum(lastCharacter = getchar())) {
       currentToken += lastCharacter;
     }
@@ -51,8 +52,7 @@ static Token getToken() {
   }
 
   // parse numbers
-  if (isdigit(lastCharacter)) {
-    currentToken = lastCharacter;
+  else if (isdigit(lastCharacter)) {
     while (isdigit(lastCharacter = getchar())) {
       currentToken += lastCharacter;
     }
@@ -67,13 +67,39 @@ static Token getToken() {
     code = tok_number;
   }
 
+  // parse comments
+  else if (lastCharacter == '#') {
+    do lastCharacter = getchar();
+    while (lastCharacter != EOF &&
+        lastCharacter != '\n' &&
+        lastCharacter != '\r');
+
+    if (lastCharacter != EOF) {
+      return getToken();
+    }
+  }
+
+  // parse EOF
+  else if (lastCharacter == EOF) {
+    currentToken = "";
+    code = tok_eof;
+  }
+
+  // parse extras
+  else {
+   code = lastCharacter;
+  }
+
   return new Token(code, currentToken);
 }
 
 int main(void) {
-  Token tok =  getToken();
+  Token tok;
 
-  std::cout << "token code " << tok.code << ", literally: " << tok.value;
+  while ((tok = getToken()).code != tok_eof) {
+    std::cout << "token code " << tok.code << ", literally: " << tok.value;
+    std::cout << std::endl;
+  }
 
   return 0;
 }
