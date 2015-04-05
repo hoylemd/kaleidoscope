@@ -10,14 +10,18 @@ PARSER_HEADER=parser.h
 PARSER_OBJECT=parser.o
 
 MAIN_SOURCE=main.cpp
+TEST_SOURCE=test.cpp
 
 SOURCES=$(LEXER_SOURCE) $(PARSER_SOURCE) $(MAIN_SOURCE)
 HEADERS=$(LEXER_HEADER) $(PARSER_HEADER)
 OBJECTS=$(LEXER_OBJECT) $(PARSER_OBJECT)
 
 EXECUTABLE=kaleidoscope
+TESTS=ktest
 
 TESTFILE=fibo.k
+TESTOUT=test.out
+TESTFIXTURE=test.fix
 
 all: go
 
@@ -33,8 +37,11 @@ compileall: $(OBJECTS) $(HEADERS) $(MAIN_SOURCE)
 go: compileall
 	./$(EXECUTABLE)
 
-test: clean compileall
-	cat $(TESTFILE) | ./$(EXECUTABLE)
+test: clean $(OBJECTS) $(HEADERS) $(TEST_SOURCE)
+	$(COMPILER) $(FLAGS) $(OBJECTS) $(TEST_SOURCE) -o $(TESTS)
+	cat $(TESTFILE) | ./$(TESTS) > $(TESTOUT)
+	diff $(TESTOUT) $(TESTFIXTURE)
+
 
 clean :
-	rm -rf $(EXECUTABLE) $(OBJECTS)
+	rm -rf $(EXECUTABLE) $(TESTS) $(OBJECTS) $(TESTOUT)
