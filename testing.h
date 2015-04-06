@@ -10,8 +10,9 @@ struct result {
   std::string expected;
   std::string actual;
   int asserts;
-  result(std::string n) :
-    pass(true), name(n), comment(""), expected(""), actual(""), asserts(0) {}
+  int failedAsserts;
+  result(std::string n) : pass(true), name(n), comment(""),
+    expected(""), actual(""), asserts(0), failedAsserts(0) {}
 };
 
 std::string doubleToString(double value) {
@@ -26,15 +27,36 @@ std::string pointerToString(void * value) {
   return s.str();
 }
 
+result* reportFailure(result* out, std::string comment,
+    std::string expected, std::string actual) {
+  out->pass = false;
+  out->failedAsserts += 1;
+  out->comment = comment;
+  out->expected = expected;
+  out->actual = actual;
+
+  return out;
+}
+
+bool assertInteger(int expected, int actual, result* out,
+    const std::string failureComment) {
+  if (out->pass) {
+    out->asserts += 1;
+    if (expected != actual) {
+      reportFailure(out, failureComment,
+        doubleToString(expected), doubleToString(actual));
+    }
+  }
+  return out->pass;
+}
+
 bool assertDouble(double expected, double actual, result* out,
     const std::string failureComment) {
   if (out->pass) {
     out->asserts += 1;
     if (expected != actual) {
-      out->pass = false;
-      out->comment = failureComment;
-      out->expected = doubleToString(expected);
-      out->actual = doubleToString(actual);
+      reportFailure(out, failureComment,
+        doubleToString(expected), doubleToString(actual));
     }
   }
   return out->pass;
@@ -45,38 +67,8 @@ bool assertChar(char expected, char actual, result* out,
   if (out->pass) {
     out->asserts += 1;
     if (expected != actual) {
-      out->pass = false;
-      out->comment = failureComment;
-      out->expected = expected;
-      out->actual = actual;
-    }
-  }
-  return out->pass;
-}
-
-bool assertInteger(int expected, int actual, result* out,
-    const std::string failureComment) {
-  if (out->pass) {
-    out->asserts += 1;
-    if (expected != actual) {
-      out->pass = false;
-      out->comment = failureComment;
-      out->expected = doubleToString(expected);
-      out->actual = doubleToString(actual);
-    }
-  }
-  return out->pass;
-}
-
-bool assertPointer(void* expected, void* actual, result* out,
-    const std::string failureComment) {
-  if (out->pass) {
-    out->asserts += 1;
-    if (expected != actual) {
-      out->pass = false;
-      out->comment = failureComment;
-      out->expected = pointerToString(expected);
-      out->actual = pointerToString(actual);
+      reportFailure(out, failureComment,
+        std::string(1, expected), std::string(1, actual));
     }
   }
   return out->pass;
@@ -87,23 +79,35 @@ bool assertString(std::string expected, std::string actual, result* out,
   if (out->pass) {
     out->asserts += 1;
     if (expected != actual) {
-      out->pass = false;
-      out->comment = failureComment;
-      out->expected = expected;
-      out->actual = actual;
+      reportFailure(out, failureComment, expected, actual);
+    }
+  }
+  return out->pass;
+}
+
+bool assertPointer(void* expected, void* actual, result* out,
+    const std::string failureComment) {
+  if (out->pass) {
+    out->asserts += 1;
+    if (expected != actual) {
+      reportFailure(out, failureComment,
+        pointerToString(expected), pointerToString(actual));
     }
   }
   return out->pass;
 }
 
 void print_results(std::vector<result*>* results) {
-  int total = results->size(), i = 0, passes = 0, failures = 0, asserts = 0;
+  int total = results->size(), i = 0, passes = 0, failures = 0,
+    asserts = 0, passedAsserts = 0, failedAsserts = 0;
   std::string failBuffer = "";
   result * current = NULL;
 
   for (i = 0; i < total; i += 1) {
     current = (*results)[i];
     asserts += current->asserts;
+    passedAsserts += current->asserts - current->failedAsserts;
+    failedAsserts += current->failedAsserts;
     if (current->pass) {
       passes += 1;
     } else {
@@ -121,10 +125,10 @@ void print_results(std::vector<result*>* results) {
 
   std::cout << "Test Summary" << std::endl;
   std::cout << "============" << std::endl;
-  std::cout << "total: " << total << ", pass: " << passes;
-  std::cout << ", failures: " << failures;
-  std::cout << " (" << asserts << " total assertions)" << std::endl;
-  std::cout << std::endl;
+  std::cout << "all cases : " << total << ", pass: " << passes;
+  std::cout << ", failures: " << failures << std::endl;
+  std::cout << "assertions: " << asserts << ", pass: " << passedAsserts;
+  std::cout << ", failures: " << failedAsserts << std::endl;
   if (failures) {
     std::cout << "Specific Failures:" << std::endl << failBuffer << std::endl;
   }
