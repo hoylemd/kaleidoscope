@@ -4,19 +4,19 @@
 class Expression {
 };
 
-class NumberExpression : Expression {
+class NumberExpression : public Expression {
   public:
     double numberValue;
     NumberExpression(double nv) : numberValue(nv) {}
 };
 
-class VariableExpression : Expression {
+class VariableExpression : public Expression {
   public:
     std::string name;
     VariableExpression(std::string n) : name(n) {};
 };
 
-class BinaryOperationExpression : Expression {
+class BinaryOperationExpression : public Expression {
   public:
     Expression *leftOperand, *rightOperand;
     char operatorChar;
@@ -25,7 +25,7 @@ class BinaryOperationExpression : Expression {
     ~BinaryOperationExpression();
 };
 
-class InvocationExpression : Expression {
+class InvocationExpression : public Expression {
   public:
     std::string callee;
     std::vector<Expression*>* arguments;

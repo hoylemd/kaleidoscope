@@ -23,6 +23,12 @@ std::string doubleToString(double value) {
   return s.str();
 }
 
+std::string pointerToString(void * value) {
+  std::stringstream s;
+  s << value;
+  return s.str();
+}
+
 void print_results(std::vector<result*>* results) {
   int total = results->size(), i = 0, passes = 0, failures = 0;
   std::string failBuffer = "";
@@ -50,7 +56,9 @@ void print_results(std::vector<result*>* results) {
   std::cout << "total: " << total << ", pass: " << passes;
   std::cout << ", failures: " << failures << std::endl;
   std::cout << std::endl;
-  std::cout << "Specific Failures:" << std::endl << failBuffer << std::endl;
+  if (failures) {
+    std::cout << "Specific Failures:" << std::endl << failBuffer << std::endl;
+  }
 
   return;
 }
