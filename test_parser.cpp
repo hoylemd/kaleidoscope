@@ -1,12 +1,28 @@
 #include "parser.h"
 #include "testing.h"
+#include <cstdio>
+#include <cstdlib>
 
 result * test_expression() {
-  // test Expression
   Expression * expression = new Expression();
   delete expression;
 
-  return new result(true, "Expression", "allocation and delete successful");
+  return new result("Expression");
+}
+
+result * test_numberExpression() {
+  result * out = new result("NumberExpression");
+  double probe = 12.234;
+  NumberExpression * subject = new NumberExpression(probe);
+
+  if (subject->numberValue != probe) {
+    out->pass = false;
+    out->comment = "number literal was stored incorectly";
+    out->expected += doubleToString(probe);
+    out->actual += doubleToString(subject->numberValue);
+  }
+
+  return out;
 }
 
 int main(void) {
@@ -14,10 +30,9 @@ int main(void) {
   int i = 0;
 
   results->push_back(test_expression());
+  results->push_back(test_numberExpression());
 
- /* // test NumberExpression
-  NumberExpression * numberExpression = new NumberExpression(12.567);
-
+  /*
   // test VariableExpression
   VariableExpression * variableExpression = new VariableExpression("variable");
 

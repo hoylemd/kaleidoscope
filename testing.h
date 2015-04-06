@@ -1,13 +1,27 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <sstream>
 
 struct result {
   bool pass;
   std::string name;
   std::string comment;
-  result(bool p, std::string n, std::string c) : pass(p), name(n), comment(c) {}
+  std::string expected;
+  std::string actual;
+  result(bool p, std::string n, std::string c) :
+    pass(p), name(n), comment(c), expected(""), actual("") {}
+  result(std::string n, std::string c) :
+    pass(false), name(n), comment(c), expected(""), actual("") {}
+  result(std::string n) :
+    pass(true), name(n), comment(""), expected(""), actual("") {}
 };
+
+std::string doubleToString(double value) {
+  std::stringstream s;
+  s << value;
+  return s.str();
+}
 
 void print_results(std::vector<result*>* results) {
   int total = results->size(), i = 0, passes = 0, failures = 0;
@@ -21,9 +35,13 @@ void print_results(std::vector<result*>* results) {
     } else {
       failures += 1;
       if (failBuffer != "") {
-        failBuffer = failBuffer + '\n'; // TODO: use endl
+        failBuffer = failBuffer + '\n';
       }
       failBuffer += current->name + ": " + current->comment;
+      if (current->expected != "") {
+        failBuffer += "\n\texpected:" + current->expected;
+        failBuffer += "\n\tactual  :" + current->actual;
+      }
     }
   }
 
