@@ -1,5 +1,6 @@
 COMPILER=G++
-FLAGS=-Wall -pedantic -ansi
+FLAGS=-Wall -pedantic -ansi -g -o0
+MEMCHECK=valgrind --leak-check=full
 
 LEXER_SOURCE=lexer.cpp
 LEXER_HEADER=lexer.h
@@ -54,7 +55,7 @@ tokenizer_test: tokenizer $(OBJECTS) $(TESTFIXTURE)
 
 parser_test: $(PARSER_OBJECT) $(PARSER_HEADER) $(PARSER_TEST_SOURCE)
 	$(COMPILE_OBJECTS) $(PARSER_OBJECT) $(PARSER_TEST_SOURCE) -o $(PARSER_TEST)
-	./$(PARSER_TEST)
+	$(MEMCHECK) ./$(PARSER_TEST)
 
 clean :
 	rm -rf $(EXECUTABLES) $(OBJECTS) $(TESTOUT)
