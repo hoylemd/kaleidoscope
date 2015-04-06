@@ -12,3 +12,12 @@ InvocationExpression::~InvocationExpression () {
   }
   delete arguments;
 }
+
+Signature::Signature(const std::string n, std::vector<std::string>* p) :
+  name(n), parameters(p) {
+  parameterCount = parameters->size();
+}
+
+Signature::~Signature() {
+  delete parameters;
+}

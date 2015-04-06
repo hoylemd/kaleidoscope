@@ -13,7 +13,7 @@ class NumberExpression : public Expression {
 class VariableExpression : public Expression {
   public:
     std::string name;
-    VariableExpression(std::string n) : name(n) {};
+    VariableExpression(const std::string n) : name(n) {};
 };
 
 class BinaryOperationExpression : public Expression {
@@ -29,7 +29,16 @@ class InvocationExpression : public Expression {
   public:
     std::string callee;
     std::vector<Expression*>* arguments;
-    InvocationExpression(std::string c, std::vector<Expression*>* a) :
+    InvocationExpression(const std::string c, std::vector<Expression*>* a) :
       callee(c), arguments(a) {};
     ~InvocationExpression();
+};
+
+class Signature {
+  public:
+    std::string name;
+    std::vector<std::string>* parameters;
+    int parameterCount;
+    Signature(const std::string n, std::vector<std::string>* p);
+    ~Signature();
 };

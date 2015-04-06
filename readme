@@ -1,0 +1,4 @@
+Heap Summary (883e771)
+==25854== HEAP SUMMARY:
+==25854==     in use at exit: 34,847 bytes in 428 blocks
+==25854==   total heap usage: 524 allocs, 96 frees, 41,340 bytes allocated

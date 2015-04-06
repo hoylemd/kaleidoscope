@@ -3,81 +3,60 @@
 #include <cstdio>
 #include <cstdlib>
 
-result * test_expression() {
+result* test_expression() {
   Expression * expression = new Expression();
   delete expression;
 
   return new result("Expression");
 }
 
-result * test_numberExpression() {
-  result * out = new result("NumberExpression");
+result* test_numberExpression() {
+  result* out = new result("NumberExpression");
   double probe = 12.234;
   NumberExpression * subject = new NumberExpression(probe);
 
-  if (subject->numberValue != probe) {
-    out->pass = false;
-    out->comment = "number literal was stored incorectly";
-    out->expected += doubleToString(probe);
-    out->actual += doubleToString(subject->numberValue);
-  }
+  assertDouble(probe, subject->numberValue, out,
+    "number literal store incorrectly");
 
   delete subject;
 
   return out;
 }
 
-result * test_variableExpression() {
-  result * out = new result("VariableExpression");
+result* test_variableExpression() {
+  result* out = new result("VariableExpression");
   std::string probe = "foo";
   VariableExpression * subject = new VariableExpression(probe);
 
-  if (subject->name != probe) {
-    out->pass = false;
-    out->comment = "name was stored incorectly";
-    out->expected += probe;
-    out->actual += subject->name;
-  }
+  assertString(probe, subject->name, out, "name stored incorrectly");
 
   delete subject;
   return out;
 }
 
-result * test_binaryExpression() {
-  result * out = new result("BinaryOperatorExpression");
+result* test_binaryExpression() {
+  result* out = new result("BinaryOperatorExpression");
   char op = '+';
   NumberExpression * left = new NumberExpression(4),
                    * right = new NumberExpression(2.5);
   BinaryOperationExpression * subject =
     new BinaryOperationExpression(left, op, right);
 
-  if (subject->leftOperand != left) {
-    out->pass = false;
-    out->comment = "left operand was stored incorectly";
-    out->expected += pointerToString(left);
-    out->actual += pointerToString(subject->leftOperand);
-  }
+  assertPointer(left, subject->leftOperand, out,
+    "left operand stored incorrectly");
 
-  if (out->pass && subject->operatorChar != op) {
-    out->pass = false;
-    out->comment = "operator was stored incorectly";
-    out->expected += op;
-    out->actual += subject->operatorChar;
-  }
+  assertChar(op, subject->operatorChar, out,
+    "operator stored incorrectly");
 
-  if (out->pass && subject->rightOperand != right) {
-    out->pass = false;
-    out->comment = "right operand was stored incorectly";
-    out->expected += pointerToString(right);
-    out->actual += pointerToString(subject->rightOperand);
-  }
+  assertPointer(right, subject->rightOperand, out,
+    "right operand stored incorrectly");
 
   delete subject;
   return out;
 }
 
-result * test_invocationExpression() {
-  result * out = new result("InvocationExpression");
+result* test_invocationExpression() {
+  result* out = new result("InvocationExpression");
   std::string callee = "add";
   NumberExpression * firstArg = new NumberExpression(2.5),
                    * secondArg = new NumberExpression(4);
@@ -86,30 +65,37 @@ result * test_invocationExpression() {
   args->push_back(secondArg);
   InvocationExpression * subject = new InvocationExpression(callee, args);
 
-  if (subject->callee != callee) {
-    out->pass = false;
-    out->comment = "callee was stored incorectly";
-    out->expected += callee;
-    out->actual += subject->callee;
-  }
-
-  if (out->pass && (*subject->arguments)[0] != firstArg) {
-    out->pass = false;
-    out->comment = "first argument was stored incorectly";
-    out->expected += pointerToString(firstArg);
-    out->actual += pointerToString((*subject->arguments)[0]);
-  }
-
-  if (out->pass && (*subject->arguments)[1] != secondArg) {
-    out->pass = false;
-    out->comment = "second argument was stored incorectly";
-    out->expected += pointerToString(secondArg);
-    out->actual += pointerToString((*subject->arguments)[1]);
-  }
+  assertString(callee, subject->callee, out,
+    "callee stored incorrectly");
+  assertPointer(firstArg, (*subject->arguments)[0], out,
+    "first argument was stored incorectly");
+  assertPointer(secondArg, (*subject->arguments)[1], out,
+    "second argument was stored incorectly");
 
   delete subject;
   return out;
 }
+
+result* test_signature() {
+  result* out = new result("Signature");
+  std::string name = "add", param1 = "left", param2 = "right";
+  std::vector<std::string> * params = new std::vector<std::string>();
+  params->push_back(param1);
+  params->push_back(param2);
+  Signature * subject = new Signature(name, params);
+
+  assertString(name, subject->name, out, "name stored incorrectly");
+  assertString(param1, (*subject->parameters)[0], out,
+    "first parameter stored incorrectly");
+  assertString(param2, (*subject->parameters)[1], out,
+    "second parameter stored incorrectly");
+  assertInteger(2, subject->parameterCount, out,
+    "parameterCount calculated incorrectly");
+
+  delete subject;
+  return out;
+}
+
 
 int main(void) {
   std::vector<result*>* results = new std::vector<result*>();
@@ -120,6 +106,7 @@ int main(void) {
   results->push_back(test_variableExpression());
   results->push_back(test_binaryExpression());
   results->push_back(test_invocationExpression());
+  results->push_back(test_signature());
 
   print_results(results);
 
