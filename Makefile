@@ -2,6 +2,8 @@ COMPILER=G++
 FLAGS=-Wall -pedantic -ansi -g -o0
 MEMCHECK=valgrind --leak-check=full
 
+TESTING_HEADER=testing.h
+
 LEXER_SOURCE=lexer.cpp
 LEXER_HEADER=lexer.h
 LEXER_OBJECT=lexer.o
@@ -12,6 +14,7 @@ PARSER_OBJECT=parser.o
 
 MAIN_SOURCE=main.cpp
 TOKENIZER_SOURCE=tokenizer.cpp
+PARSER_MEMCHECK=test_parser_memory.cpp
 PARSER_TEST_SOURCE=test_parser.cpp
 
 SOURCES=$(LEXER_SOURCE) $(PARSER_SOURCE) $(MAIN_SOURCE)
@@ -22,7 +25,8 @@ EXECUTABLE=kaleidoscope
 TESTS=ktest
 TOKENIZER=tokenizer
 PARSER_TEST=parse_test
-EXECUTABLES=$(EXECUTABLE) $(TESTS) $(TOKENIZER) $(PARSER_TEST)
+PARSER_MEMTEST=parse_memtest
+EXECUTABLES=$(EXECUTABLE) $(TESTS) $(TOKENIZER) $(PARSER_TEST) $(PARSER_MEMTEST)
 
 TESTFILE=fibo.k
 TESTOUT=test.out
@@ -53,9 +57,15 @@ tokenizer_test: tokenizer $(OBJECTS) $(TESTFIXTURE)
 	cat $(TESTFILE) | ./$(TOKENIZER) > $(TESTOUT)
 	diff $(TESTOUT) $(TESTFIXTURE)
 
-parser_test: $(PARSER_OBJECT) $(PARSER_HEADER) $(PARSER_TEST_SOURCE)
+parser_mem_test: $(PARSER_OBJECT) $(PARSER_HEADER) $(PARSER_MEMCHECK)
+	$(COMPILE_OBJECTS) $(PARSER_OBJECT) $(PARSER_MEMCHECK) -o $(PARSER_MEMTEST)
+	$(MEMCHECK) ./$(PARSER_MEMTEST)
+
+parser_fun_test: $(TESTING_HEADER) $(PARSER_TEST_SOURCE)
 	$(COMPILE_OBJECTS) $(PARSER_OBJECT) $(PARSER_TEST_SOURCE) -o $(PARSER_TEST)
-	$(MEMCHECK) ./$(PARSER_TEST)
+	./$(PARSER_TEST)
+
+parser_test: parser_mem_test parser_fun_test
 
 clean :
 	rm -rf $(EXECUTABLES) $(OBJECTS) $(TESTOUT)
