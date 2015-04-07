@@ -1,6 +1,6 @@
 COMPILER=G++
 FLAGS=-Wall -pedantic -ansi -g -o0
-MEMCHECK=valgrind --leak-check=full
+MEMCHECK=valgrind --leak-check=full -v
 
 TESTING_HEADER=testing.h
 

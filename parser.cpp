@@ -1,4 +1,5 @@
 #include "parser.h"
+#include <iostream>
 
 BinaryOperationExpression::~BinaryOperationExpression () {
   delete leftOperand;
@@ -20,4 +21,9 @@ Signature::Signature(const std::string n, std::vector<std::string>* p) :
 
 Signature::~Signature() {
   delete parameters;
+}
+
+FunctionDefinition::~FunctionDefinition() {
+  delete signature;
+  delete body;
 }

@@ -42,3 +42,11 @@ class Signature {
     Signature(const std::string n, std::vector<std::string>* p);
     ~Signature();
 };
+
+class FunctionDefinition {
+  public:
+    Signature* signature;
+    Expression* body;
+    FunctionDefinition(Signature* s, Expression* b) : signature(s), body(b) {};
+    ~FunctionDefinition();
+};
